@@ -3,40 +3,37 @@ import dotenv from "dotenv";
 import express from "express";
 import nodemailer from "nodemailer";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// CORS configuration
+// Dynamic CORS: allow any origin
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", // Local frontend
-      "https://my-portfolio-hu1mu2bzp-raymonds-projects-0478c341.vercel.app", // Your deployed frontend
-      "https://raymondmapayo24.vercel.app", // Optional if frontend is on same domain
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like curl, Postman)
+      if (!origin) return callback(null, true);
+      // Allow all deployed frontends
+      callback(null, true);
+    },
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
   })
 );
 
-// Handle preflight requests for send-email
+// Handle preflight requests
 app.options("/api/send-email", cors());
 
-// Parse JSON requests
 app.use(express.json());
 
-// POST endpoint to send emails
 app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
-
   if (!name || !email || !message) {
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, ""); // Remove spaces
+  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, "");
 
   if (!emailUser || !emailPass) {
     console.error("EMAIL_USER or EMAIL_PASS is missing in environment");
@@ -65,7 +62,6 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
-// Listen on environment PORT or 8081
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
