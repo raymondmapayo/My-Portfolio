@@ -1,42 +1,23 @@
-import cors from "cors";
-import dotenv from "dotenv";
-import express from "express";
+// /api/send-email.ts (Vercel serverless)
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import nodemailer from "nodemailer";
 
-dotenv.config();
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
 
-const app = express();
-
-// Dynamic CORS: allow any origin
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like curl, Postman)
-      if (!origin) return callback(null, true);
-      // Allow all deployed frontends
-      callback(null, true);
-    },
-    methods: ["GET", "POST", "OPTIONS"],
-    credentials: true,
-  })
-);
-
-// Handle preflight requests
-app.options("/api/send-email", cors());
-
-app.use(express.json());
-
-app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
   if (!name || !email || !message) {
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, "");
+  const emailPass = process.env.EMAIL_PASS?.trim();
 
   if (!emailUser || !emailPass) {
-    console.error("EMAIL_USER or EMAIL_PASS is missing in environment");
     return res
       .status(500)
       .json({ success: false, error: "Server email credentials missing" });
@@ -60,11 +41,4 @@ app.post("/api/send-email", async (req, res) => {
     console.error("Nodemailer error:", err);
     return res.status(500).json({ success: false, error: String(err) });
   }
-});
-
-const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
-
-export default app;
+}
