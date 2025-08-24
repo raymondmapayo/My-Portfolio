@@ -3,33 +3,40 @@ import dotenv from "dotenv";
 import express from "express";
 import nodemailer from "nodemailer";
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// POST endpoint to send emails
 app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
-  if (!name || !email || !message)
-    return res.status(400).json({ success: false, message: "Missing fields" });
 
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: "Missing fields" });
+  }
+
+  // Get email credentials from environment variables
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, "");
+  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, ""); // Remove spaces
 
   if (!emailUser || !emailPass) {
-    console.error("EMAIL_USER or EMAIL_PASS is missing in .env");
+    console.error("EMAIL_USER or EMAIL_PASS is missing in environment");
     return res
       .status(500)
       .json({ success: false, error: "Server email credentials missing" });
   }
 
   try {
+    // Create Nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: emailUser, pass: emailPass },
     });
 
+    // Send the email
     await transporter.sendMail({
       from: email,
       to: emailUser,
@@ -44,7 +51,10 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
+// Use PORT from environment or default 8081
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
+
+export default app;
