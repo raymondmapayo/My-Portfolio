@@ -1,5 +1,4 @@
-// /lib/sendEmailClient.ts
-const API_URL = "/api/send-email"; // works for dev (Vite) and production (Vercel)
+const API_URL = "/api/send-email"; // relative path works both locally (Vite) & Vercel
 
 export async function sendEmailClient(
   name: string,

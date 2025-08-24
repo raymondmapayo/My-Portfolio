@@ -1,25 +1,26 @@
-import * as cors from "cors";
-import * as dotenv from "dotenv";
-import * as express from "express";
-import * as nodemailer from "nodemailer";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import nodemailer from "nodemailer";
 
-dotenv.config();
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Only allow POST requests
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
 
-const app = express(); // express() works
-app.use(cors());
-app.use(express.json());
-
-app.post("/api/send-email", async (req, res) => {
+  // Extract form data
   const { name, email, message } = req.body ?? {};
-  if (!name || !email || !message)
+  if (!name || !email || !message) {
     return res.status(400).json({ success: false, message: "Missing fields" });
+  }
 
-  // Safely get environment variables
+  // Get credentials from Vercel environment variables
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, ""); // remove spaces safely
+  const emailPass = process.env.EMAIL_PASS?.trim();
 
   if (!emailUser || !emailPass) {
-    console.error("EMAIL_USER or EMAIL_PASS is missing in .env");
+    console.error("EMAIL_USER or EMAIL_PASS is missing in environment");
     return res
       .status(500)
       .json({ success: false, error: "Server email credentials missing" });
@@ -28,12 +29,10 @@ app.post("/api/send-email", async (req, res) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
+      auth: { user: emailUser, pass: emailPass },
     });
 
+    // Send the email
     await transporter.sendMail({
       from: email,
       to: emailUser,
@@ -46,6 +45,4 @@ app.post("/api/send-email", async (req, res) => {
     console.error("Nodemailer error:", err);
     return res.status(500).json({ success: false, error: String(err) });
   }
-});
-
-app.listen(8081, () => console.log("Server running on http://localhost:8081"));
+}
