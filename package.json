@@ -3,12 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:server": "tsx server.ts"
+    "start:server": "tsx server.ts",
+    "vercel-build": " vite build"
   },
   "dependencies": {
     "@apollo/client": "^3.13.9",
