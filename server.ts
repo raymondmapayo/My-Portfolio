@@ -7,7 +7,24 @@ import nodemailer from "nodemailer";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // Local frontend
+      "https://my-portfolio-hu1mu2bzp-raymonds-projects-0478c341.vercel.app", // Your deployed frontend
+      "https://raymondmapayo24.vercel.app", // Optional if frontend is on same domain
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+  })
+);
+
+// Handle preflight requests for send-email
+app.options("/api/send-email", cors());
+
+// Parse JSON requests
 app.use(express.json());
 
 // POST endpoint to send emails
@@ -18,7 +35,6 @@ app.post("/api/send-email", async (req, res) => {
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
-  // Get email credentials from environment variables
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, ""); // Remove spaces
 
@@ -30,13 +46,11 @@ app.post("/api/send-email", async (req, res) => {
   }
 
   try {
-    // Create Nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: emailUser, pass: emailPass },
     });
 
-    // Send the email
     await transporter.sendMail({
       from: email,
       to: emailUser,
@@ -51,7 +65,7 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
-// Use PORT from environment or default 8081
+// Listen on environment PORT or 8081
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)

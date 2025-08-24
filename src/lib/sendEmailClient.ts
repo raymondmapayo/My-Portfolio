@@ -1,8 +1,8 @@
-// Automatically switch URL depending on environment
+// Automatically switch API URL depending on environment
 const API_URL =
   process.env.NODE_ENV === "production"
-    ? "https://raymondmapayo24.vercel.app/api/send-email" // Deployed Vercel URL
-    : "http://localhost:8081/api/send-email"; // Local development
+    ? "https://raymondmapayo24.vercel.app/api/send-email" // Deployed backend
+    : "http://localhost:8081/api/send-email"; // Local backend
 
 export async function sendEmailClient(
   name: string,
