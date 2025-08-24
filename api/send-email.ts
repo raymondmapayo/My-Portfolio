@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Get credentials from Vercel environment variables
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.trim();
+  const emailPass = process.env.EMAIL_PASS?.replace(/\s+/g, ""); // remove any spaces
 
   if (!emailUser || !emailPass) {
     console.error("EMAIL_USER or EMAIL_PASS is missing in environment");
@@ -27,18 +27,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    console.log("Creating transporter...");
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: emailUser, pass: emailPass },
     });
+    console.log("Transporter created.");
 
-    // Send the email
+    console.log("Sending email...");
     await transporter.sendMail({
-      from: email,
-      to: emailUser,
+      from: emailUser, // your Gmail
+      replyTo: email, // user email
+      to: emailUser, // send to yourself
       subject: `New message from ${name}`,
       text: message,
     });
+    console.log("Email sent successfully.");
 
     return res.status(200).json({ success: true });
   } catch (err) {
