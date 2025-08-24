@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/module/*": ["src/module/*"],
+      "@/schema/*": ["src/schema/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/Pages/*": ["src/Pages/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "@/graphql/*": ["src/graphql/*"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

@@ -1,0 +1,369 @@
+@import url("https://fonts.cdnfonts.com/css/akira-expanded");
+
+/* Custom font class */
+.akira-font {
+  font-family: "Akira Expanded", sans-serif;
+}
+
+/* Global font sizing and defaults */
+html {
+  font-size: 16px;
+}
+
+body {
+  @apply text-base text-gray-800 antialiased;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji";
+  line-height: 1.5;
+}
+
+/* THIS IS FOR SHADOW AT SKILL START*/
+
+@keyframes superLoopLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(
+      -50%
+    ); /* Scroll only half the width (1 set of icons) */
+  }
+}
+
+@keyframes superLoopRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0); /* Scroll back the other way */
+  }
+}
+
+.super-loop-left,
+.super-loop-right {
+  display: flex;
+  width: max-content; /* Makes sure duplicated icons line up */
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 50s; /* Adjust to change speed */
+}
+
+.super-loop-left {
+  animation-name: superLoopLeft;
+}
+
+.super-loop-right {
+  animation-name: superLoopRight;
+}
+
+/* Hover Pause */
+.pause-animation {
+  animation-play-state: paused !important;
+}
+
+/* Fade gradient edges */
+.fade-mask {
+  position: relative;
+  overflow: hidden;
+}
+
+.fade-mask::before,
+.fade-mask::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.fade-mask::before {
+  left: 0;
+  background: linear-gradient(to right, white, transparent);
+}
+
+.fade-mask::after {
+  right: 0;
+  background: linear-gradient(to left, white, transparent);
+}
+
+/* Dark mode override */
+.dark .fade-mask::before {
+  background: linear-gradient(
+    to right,
+    #111827,
+    transparent
+  ); /* same as bg-gray-900 */
+}
+
+.dark .fade-mask::after {
+  background: linear-gradient(
+    to left,
+    #111827,
+    transparent
+  ); /* same as bg-gray-900 */
+}
+/* THIS IS FOR SHADOW AT SKILL END*/
+
+/* THIS IS FOR EXPERTISE AT EXPERTISE START*/
+/* Remove default AntD header padding so icons align left */
+.expertise-collapse .ant-collapse-header {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Keep expand arrow on the far right without shifting content */
+.expertise-collapse .ant-collapse-expand-icon {
+  margin-left: auto !important;
+  margin-top: 0 !important;
+}
+
+/* Optional: remove extra gap for first child */
+.expertise-collapse .ant-collapse-header > *:first-child {
+  margin-left: 0 !important;
+}
+
+/* Borders and dark mode styles remain as you had them */
+.expertise-collapse .ant-collapse-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.expertise-collapse .ant-collapse-item:last-child {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.expertise-collapse .ant-collapse-item-active {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.dark .expertise-collapse .ant-collapse-arrow,
+.dark .expertise-collapse .ant-collapse-expand-icon svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* THIS IS FOR EXPERTISE AT EXPERTISE END*/
+/* In your CSS file */
+
+::-webkit-scrollbar {
+  display: none;
+}
+/* Put this in your index.css or a global stylesheet */
+
+.custom-menu .menu-link {
+  color: #1f2937; /* Tailwind gray-800 for light mode */
+  transition: color 0.2s;
+}
+
+html.dark .custom-menu .menu-link {
+  color: #e5e7eb !important; /* Tailwind gray-200 for dark mode */
+}
+
+.custom-menu .menu-icon {
+  transition: color 0.2s;
+}
+
+html.dark .custom-menu .menu-icon {
+  color: #e5e7eb !important;
+}
+
+/* Desktop (normal look) */
+.show-credentials-btn {
+  padding: 16px 14px;
+}
+
+/* On smaller screens: hide text and shrink button */
+@media (max-width: 768px) {
+  .show-credentials-btn .btn-text {
+    display: none;
+  }
+
+  .show-credentials-btn {
+    padding: 10px;
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+/* ==========================================================================================================================*/
+/* CELANDAR GIT HUB DARK MOOD  START*/
+
+.calendar-wrapper text {
+  fill: #374151; /* Gray-700 in light mode */
+  font-size: 12px;
+}
+.dark .calendar-wrapper text {
+  fill: #ffffff; /* White in dark mode */
+}
+
+/* Style the contribution count text */
+.react-activity-calendar__count {
+  color: #374151; /* Gray-700 in light mode */
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.dark .react-activity-calendar__count {
+  color: #ffffff; /* White in dark mode */
+}
+
+/* Style the "Less" and "More" labels */
+.react-activity-calendar__legend span {
+  color: #374151; /* Gray-700 for light mode */
+  font-size: 13px;
+}
+.dark .react-activity-calendar__legend span {
+  color: #ffffff; /* White for dark mode */
+}
+
+/* Remove white box behind SVG entirely */
+.calendar-wrapper svg {
+  background-color: transparent;
+}
+
+/* Dark mode block colors (activity squares) */
+.dark .calendar-wrapper rect[fill="#ebedf0"] {
+  fill: #1f2937;
+}
+.dark .calendar-wrapper rect[fill="#9be9a8"] {
+  fill: #10b981;
+}
+.dark .calendar-wrapper rect[fill="#40c463"] {
+  fill: #059669;
+}
+.dark .calendar-wrapper rect[fill="#30a14e"] {
+  fill: #047857;
+}
+.dark .calendar-wrapper rect[fill="#216e39"] {
+  fill: #065f46;
+}
+/* Footer styles (contribution count + Less/More legend) */
+.react-activity-calendar__footer {
+  color: #374151; /* Gray-700 for light mode */
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Count text ("981 contributions in the last year") */
+.react-activity-calendar__count {
+  color: #374151; /* Light mode text */
+  font-weight: 500;
+}
+
+/* Less/More labels */
+.react-activity-calendar__legend-colors span {
+  color: #374151; /* Light mode text */
+  font-size: 13px;
+}
+
+/* Dark mode overrides */
+.dark .react-activity-calendar__footer,
+.dark .react-activity-calendar__count,
+.dark .react-activity-calendar__legend-colors span {
+  color: #ffffff; /* Make all footer text white in dark mode */
+}
+/* Default year selector buttons (unselected) */
+.dark .ant-btn-default {
+  background-color: #1f2937 !important; /* Dark neutral background */
+  border-color: #374151 !important; /* Subtle border */
+  color: #e5e7eb !important; /* Light text */
+}
+
+/* Hover state for default buttons */
+.dark .ant-btn-default:hover {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #ffffff !important;
+}
+
+/* Primary (selected) year button */
+.dark .ant-btn-primary {
+  background-color: #2563eb !important; /* Tailwind blue-600 */
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Hover for primary button */
+.dark .ant-btn-primary:hover {
+  background-color: #1d4ed8 !important; /* Tailwind blue-700 */
+  border-color: #1d4ed8 !important;
+}
+/* CELANDAR GIT HUB DARK MOOD  END*/
+/* ==========================================================================================================================*/
+/* ANTD TABLE DARK MOOD START*/
+
+.dark .ant-table-wrapper,
+.dark .ant-table {
+  background-color: #2b1d11 !important;
+  color: #f5f5f5 !important;
+}
+
+/* Table cells */
+.dark .ant-table-cell {
+  background-color: transparent !important;
+  color: #f5f5f5 !important;
+  border-color: #3a2918 !important; /* subtle border */
+}
+
+/* Hover row background */
+.dark .ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: #3a2918 !important;
+}
+
+/* Pagination (if any) */
+.dark .ant-pagination-item {
+  background-color: transparent !important;
+  border-color: #3a2918 !important;
+}
+
+.dark .ant-pagination-item a {
+  color: #f5f5f5 !important;
+}
+
+.dark .ant-pagination-item-active {
+  background-color: #3a2918 !important;
+  border-color: #3a2918 !important;
+}
+/* Pagination arrows in dark mode */
+.dark .ant-pagination-prev button,
+.dark .ant-pagination-next button {
+  background-color: transparent !important;
+  color: #f5f5f5 !important;
+  border: 1px solid #3a2918 !important;
+}
+
+/* Hover effect for arrows */
+.dark .ant-pagination-prev button:hover,
+.dark .ant-pagination-next button:hover {
+  background-color: #3a2918 !important;
+  color: #ffffff !important;
+  border-color: #3a2918 !important;
+}
+
+/* Active page number */
+.dark .ant-pagination-item-active {
+  background-color: #3a2918 !important;
+  border-color: #3a2918 !important;
+}
+
+.dark .ant-pagination-item-active a {
+  color: #ffffff !important;
+}
+/* ANTD TABLE DARK END*/
+/* Force table body to keep height, even when rows change */

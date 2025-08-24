@@ -1,0 +1,93 @@
+/* === LIGHT MODE: default menu items === */
+.custom-menu .ant-menu-item {
+  border-left: 3px solid transparent; /* default: no border */
+  background: #ffffff !important; /* light background */
+  color: #111827 !important; /* dark text */
+  height: 50px !important;
+  line-height: 60px !important;
+  padding-left: 0 !important;
+  padding-inline-start: 8px !important;
+  box-shadow: none !important;
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* Light mode hover effect */
+.custom-menu .ant-menu-item:hover {
+  background-color: #f3f4f6 !important; /* light hover background */
+  border-left: 3px solid #60a5fa; /* light blue on hover */
+}
+
+/* Light mode active/selected item */
+.custom-menu .ant-menu-item.ant-menu-item-selected {
+  background-color: #e0f2fe !important; /* slightly darker blue background */
+  border-left: 3px solid #3b82f6 !important; /* solid blue left border */
+  color: #1e3a8a !important; /* optional: darker text */
+}
+
+/* === DARK MODE ONLY === */
+html.dark .ant-layout-sider,
+html.dark .ant-layout-sider .ant-layout-sider-children,
+html.dark .custom-menu,
+html.dark .ant-menu-root {
+  background-color: #0b0b0b !important; /* fully dark sidebar */
+  color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Dark mode: default menu items - no border */
+html.dark .custom-menu .ant-menu-item,
+html.dark .ant-menu-item {
+  border-left: 3px solid transparent; /* invisible by default */
+  background: transparent !important;
+  color: #e6edf3 !important;
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* Dark mode hover effect */
+html.dark .custom-menu .ant-menu-item:hover,
+html.dark .ant-menu-item:hover {
+  background-color: #374151 !important; /* dark hover background */
+  border-left: 3px solid #60a5fa; /* light blue on hover */
+}
+
+/* Dark mode selected state */
+html.dark .custom-menu .ant-menu-item-selected,
+html.dark .ant-menu-item-selected {
+  background-color: #4b5563 !important; /* dark selected */
+  color: #fff !important;
+  border-left: 3px solid #60a5fa; /* border always for selected */
+}
+
+/* Dark mode icons */
+html.dark .custom-menu .menu-icon,
+html.dark .ant-menu-item .menu-icon {
+  color: #ffd98a !important;
+}
+
+/* Sidebar container: remove radius, full height, flex layout */
+.ant-layout-sider {
+  border-radius: 0 !important;
+  overflow: hidden; /* children respect boundaries */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* pushes footer to bottom */
+  height: 100vh;
+  padding: 1rem; /* same as p-4 */
+}
+
+/* Sidebar children wrapper */
+.ant-layout-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* fill remaining height */
+  justify-content: space-between; /* keeps footer at bottom */
+}
+
+/* Footer / bottom info */
+.sidebar-footer {
+  margin-top: auto; /* ensures it stays at bottom */
+}
