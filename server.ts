@@ -1,4 +1,3 @@
-// server.ts
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -10,15 +9,23 @@ const app = express();
 
 // ===== CORS =====
 // Allow your frontend domains
-const allowedOrigins = [
+// allow both strings and regex patterns
+const allowedOrigins: (string | RegExp)[] = [
   "http://localhost:5173", // local dev
-  "https://my-portfolio-92b8nmbv3-raymonds-projects-0478c341.vercel.app", // deployed frontend
+  "https://my-portfolio-92b8nmbv3-raymonds-projects-0478c341.vercel.app", // old Vercel
+  "https://my-portfolio-n0gknm417-raymonds-projects-0478c341.vercel.app", // new Vercel
+  /\.vercel\.app$/i, // example: allow all Vercel preview URLs
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.some((o) =>
+          o instanceof RegExp ? o.test(origin) : o === origin
+        )
+      ) {
         callback(null, true);
       } else {
         callback(new Error("CORS not allowed for this origin"));
@@ -78,9 +85,14 @@ app.post("/api/send-email", async (req, res) => {
 });
 
 // ===== OPTIONS preflight =====
-app.options("/api/send-email", (req, res) => {
-  res.sendStatus(200);
-});
+app.options(
+  "/api/send-email",
+  cors({
+    origin: allowedOrigins,
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
 // ===== Start server =====
 const PORT = process.env.PORT || 8081;
