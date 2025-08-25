@@ -1,5 +1,6 @@
-const API_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:8081/send-email";
+const API_URL = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_URL ?? "http://localhost:8081/send-email")
+  : (import.meta.env.VITE_API_URL ?? "/api/send-email");
 
 export async function sendEmailClient(
   name: string,
