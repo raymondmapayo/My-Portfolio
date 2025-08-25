@@ -11,8 +11,8 @@ const app = express();
 app.use(
   cors({
     origin:
-      "https://my-portfolio-brmq2nzkg-raymonds-projects-0478c341.vercel.app",
-    methods: ["GET", "POST"],
+      "https://my-portfolio-brmq2nzkg-raymonds-projects-0478c341.vercel.app", // your frontend URL
+    methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
@@ -37,7 +37,7 @@ app.post("/api/send-email", async (req, res) => {
       .json({ success: false, error: "Server email credentials missing" });
   }
 
-  // Optional debug logs
+  // Debug logs
   console.log("EMAIL_USER:", emailUser);
   console.log("EMAIL_PASS:", emailPass ? "SET" : "MISSING");
   console.log("Request body:", req.body);
