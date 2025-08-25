@@ -2,6 +2,20 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import nodemailer from "nodemailer";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // ===== CORS =====
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://my-portfolio-brmq2nzkg-raymonds-projects-0478c341.vercel.app"
+  ); // your frontend URL
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  // =================
+
   if (req.method !== "POST") {
     return res
       .status(405)
@@ -23,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .json({ success: false, error: "Email credentials missing" });
   }
 
-  // Optional debug logs (won't break anything)
+  // Optional debug logs
   console.log("EMAIL_USER:", emailUser);
   console.log("EMAIL_PASS:", emailPass ? "SET" : "MISSING");
   console.log("Request body:", req.body);
@@ -34,7 +48,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   try {
-    // Timeout wrapper for 30 seconds
     const info = await Promise.race([
       transporter.sendMail({
         from: emailUser,

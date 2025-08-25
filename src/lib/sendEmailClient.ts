@@ -1,6 +1,7 @@
+// src/lib/sendEmailClient.ts
 const API_URL = import.meta.env.DEV
-  ? "http://localhost:8081/api/send-email" // local dev
-  : "https://your-domain.com/api/send-email"; // deployed Express server URL
+  ? "http://localhost:8081/api/send-email" // local dev Express server
+  : "https://my-express-server.onrender.com/api/send-email"; // deployed Express server URL
 
 export async function sendEmailClient(
   name: string,
