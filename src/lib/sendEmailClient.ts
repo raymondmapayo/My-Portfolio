@@ -1,4 +1,6 @@
-const API_URL = "/api/send-email";
+const API_URL = import.meta.env.DEV
+  ? "http://localhost:8081/api/send-email"
+  : "/api/send-email";
 
 export async function sendEmailClient(
   name: string,

@@ -1,11 +1,11 @@
-import * as cors from "cors";
-import * as dotenv from "dotenv";
-import * as express from "express";
-import * as nodemailer from "nodemailer";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
-const app = express(); // express() works
+const app = express(); // ✅ works now
 app.use(cors());
 app.use(express.json());
 
@@ -14,9 +14,8 @@ app.post("/api/send-email", async (req, res) => {
   if (!name || !email || !message)
     return res.status(400).json({ success: false, message: "Missing fields" });
 
-  // Safely get environment variables
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, ""); // remove spaces safely
+  const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, "");
 
   if (!emailUser || !emailPass) {
     console.error("EMAIL_USER or EMAIL_PASS is missing in .env");
@@ -35,7 +34,8 @@ app.post("/api/send-email", async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: email,
+      from: emailUser,
+      replyTo: email,
       to: emailUser,
       subject: `New message from ${name}`,
       text: message,
