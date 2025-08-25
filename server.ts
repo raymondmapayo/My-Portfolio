@@ -1,3 +1,4 @@
+// server.ts
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -8,59 +9,44 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8081;
 
-console.log("Starting email server. Node:", process.version);
+console.log("Starting mail server - Node:", process.version);
 
 // ===== Allowed frontend domains =====
-// IMPORTANT: include the exact Vercel origin shown in your browser console.
-// From your error message: "https://my-portfolio-j06y92lma-raymonds-projects-0478c341.vercel.app"
+// IMPORTANT: include the exact Vercel origin you see in the browser console.
+// Example: "https://my-portfolio-j06y92lma-raymonds-projects-0478c341.vercel.app"
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://my-portfolio-evh016hbe-raymonds-projects-0478c341.vercel.app",
+  // add your exact deployed frontend origins here:
   "https://my-portfolio-j06y92lma-raymonds-projects-0478c341.vercel.app",
-  // add any other Vercel preview domains you use here
+  "https://my-portfolio-evh016hbe-raymonds-projects-0478c341.vercel.app",
 ];
 
-// ===== Optional quick debug: enable this to allow any origin (debug only!) =====
-// const ALLOW_ALL = true;
-const ALLOW_ALL = false;
+const ALLOW_ALL = false; // set true temporarily for debugging only
 
-// ===== CORS middleware (global) =====
+// ===== CORS middleware =====
 app.use(
   cors({
     origin: (origin, callback) => {
-      // origin === undefined for non-browser requests (curl/Postman/server)
-      console.log("CORS check - incoming origin:", origin);
-      if (!origin) {
-        // allow non-browser requests
-        return callback(null, true);
-      }
-      if (ALLOW_ALL) {
-        return callback(null, true);
-      }
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      // else reject
+      console.log("CORS check - origin:", origin);
+      if (!origin) return callback(null, true); // non-browser clients allowed
+      if (ALLOW_ALL) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
       console.warn("Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    preflightContinue: false, // let our handler return response
     optionsSuccessStatus: 204,
   })
 );
 
-// Explicit preflight handler that returns the correct headers for the browser
+// Explicit preflight handler (returns Access-Control-Allow-* for browsers)
 app.options("*", (req, res) => {
   const origin = req.header("Origin") ?? "";
-  console.log("OPTIONS preflight received from origin:", origin);
+  console.log("OPTIONS preflight from origin:", origin);
 
-  if (!origin) {
-    // Non-browser client - just return 200
-    return res.sendStatus(200);
-  }
+  if (!origin) return res.sendStatus(200);
 
   if (ALLOW_ALL || allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -69,7 +55,7 @@ app.options("*", (req, res) => {
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization"
     );
-    // If you need cookies/auth between frontend and backend, uncomment:
+    // If you need to send cookies between frontend/back, uncomment:
     // res.setHeader("Access-Control-Allow-Credentials", "true");
     return res.sendStatus(200);
   }
@@ -78,48 +64,83 @@ app.options("*", (req, res) => {
   return res.sendStatus(403);
 });
 
-// ===== JSON parser =====
+// JSON parser
 app.use(express.json());
 
-// ===== Nodemailer transporter =====
+// ===== Validate env early =====
+const emailUser = process.env.EMAIL_USER;
+const emailPass = process.env.EMAIL_PASS?.trim();
+
+console.log("Env check - EMAIL_USER present:", !!emailUser);
+console.log("Env check - EMAIL_PASS present:", !!emailPass);
+
+if (!emailUser || !emailPass) {
+  console.error(
+    "WARNING: EMAIL_USER or EMAIL_PASS missing. Add them to your environment variables."
+  );
+}
+
+// ===== Nodemailer transporter (Gmail example) =====
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true,
+  secure: true, // true for 465, false for 587
   auth: {
-    user: process.env.EMAIL_USER ?? "",
-    pass: process.env.EMAIL_PASS ?? "",
+    user: emailUser ?? "",
+    pass: emailPass ?? "",
   },
 });
 
-// Optional: verify transporter at startup (logs error if auth wrong)
+// Verify transporter at startup (logs errors but won't crash)
 transporter.verify().then(
-  () => console.log("Nodemailer transporter verified"),
-  (err) => console.warn("Nodemailer transporter verification failed:", err)
+  () => console.log("Nodemailer transporter verified (ready to send)."),
+  (err) =>
+    console.warn(
+      "Nodemailer transporter verification failed (check creds):",
+      err
+    )
 );
 
 // ===== POST /send-email =====
+// Expects: { name: string, email: string, message: string }
+// Sends email TO your EMAIL_USER and sets replyTo to the sender's email.
 app.post("/send-email", async (req, res) => {
-  console.log("POST /send-email - origin:", req.header("Origin"));
   try {
+    console.log("POST /send-email - origin:", req.header("Origin"));
     const { name, email, message } = req.body ?? {};
+
     if (!name || !email || !message) {
-      console.error("Missing fields:", req.body);
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing fields" });
+      console.error("Missing fields in request body:", req.body);
+      return res.status(400).json({
+        success: false,
+        message: "Missing fields: name, email, message",
+      });
     }
 
-    const mail = {
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      replyTo: email,
-      subject: `New message from ${name}`,
-      text: message,
+    if (!emailUser || !emailPass) {
+      console.error("Email credentials missing on server.");
+      return res
+        .status(500)
+        .json({ success: false, message: "Server email credentials missing" });
+    }
+
+    const mailOptions = {
+      from: `"Portfolio Contact" <${emailUser}>`, // sender shown in inbox
+      to: emailUser, // send to yourself
+      replyTo: email, // sender's email so you can reply directly
+      subject: `Portfolio message from ${name}`,
+      text: `You received a message from ${name} <${email}>:\n\n${message}`,
+      html: `<p><strong>From:</strong> ${name} &lt;${email}&gt;</p><p>${message}</p>`,
     };
 
-    const info = await transporter.sendMail(mail);
-    console.log("Email sent:", info?.messageId ?? info);
+    console.log("Sending mail (redacted):", {
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      replyTo: mailOptions.replyTo,
+    });
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Mail sent, id:", info?.messageId ?? info);
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error("sendMail error:", err);
@@ -127,10 +148,12 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// Simple health check
+// Simple health endpoint
 app.get("/_health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
 // Start server
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
