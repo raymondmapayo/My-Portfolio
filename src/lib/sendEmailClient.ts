@@ -10,14 +10,14 @@ export async function sendEmailClient(
 ): Promise<boolean> {
   try {
     const res = await fetch("/api/send-email", {
-      method: "POST",
+      method: "POST", // <-- MUST be POST
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
 
-    // try to parse JSON even on non-2xx to get error details
+    // try parse JSON even on non-2xx so we can log useful info
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -25,6 +25,7 @@ export async function sendEmailClient(
       return false;
     }
 
+    // success when { success: true }
     return data?.success === true;
   } catch (err) {
     console.error("sendEmailClient error:", err);

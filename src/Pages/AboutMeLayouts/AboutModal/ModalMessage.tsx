@@ -35,32 +35,33 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
   }, [open]);
 
   const handleSend = async () => {
-    // Check if any field is empty
     if (!name.trim() || !email.trim() || !message.trim()) {
       antdMessage.warning("Please fill up all fields before sending.");
-      console.warn("Cannot send: some fields are empty.");
       return;
     }
 
     setLoading(true);
-
     try {
+      console.log("Sending email: POST /api/send-email", {
+        name,
+        email,
+        message,
+      });
       const ok = await sendEmailClient({ name, email, message });
-
-      if (ok) {
-        antdMessage.success("Email sent successfully!");
-        console.log("Email sent successfully!");
-      } else {
+      console.log("sendEmailClient returned:", ok);
+      if (ok) antdMessage.success("Email sent successfully!");
+      else {
         antdMessage.error("Failed to send email.");
-        console.error("Failed to send email.");
+        console.error(
+          "Failed to send email. Check network tab and server logs."
+        );
       }
     } catch (err) {
       antdMessage.error("An unexpected error occurred.");
-      console.error("Unexpected error sending email:", err);
+      console.error("Unexpected error:", err);
     } finally {
       setLoading(false);
       onClose();
-      // Reset fields after closing
       setName("");
       setEmail("");
       setMessage("");
