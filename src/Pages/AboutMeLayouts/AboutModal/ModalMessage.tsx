@@ -1,3 +1,4 @@
+// ModalMessage.tsx
 import { sendEmailClient } from "@/lib/sendEmailClient";
 import { SendOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, message as antdMessage } from "antd";
@@ -17,8 +18,10 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
 
   const typedRef = useRef<HTMLSpanElement>(null);
 
+  // Typed.js animation for "Send a Message"
   useEffect(() => {
     if (!typedRef.current || !open) return;
+
     const typed = new Typed(typedRef.current, {
       strings: ["Send a Message"],
       typeSpeed: 50,
@@ -27,10 +30,12 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
       cursorChar: "_",
       loop: false,
     });
+
     return () => typed.destroy();
   }, [open]);
 
   const handleSend = async () => {
+    // Check if any field is empty
     if (!name.trim() || !email.trim() || !message.trim()) {
       antdMessage.warning("Please fill up all fields before sending.");
       console.warn("Cannot send: some fields are empty.");
@@ -38,21 +43,28 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
     }
 
     setLoading(true);
-    const result = await sendEmailClient(name, email, message);
-    setLoading(false);
 
-    if (result) {
-      antdMessage.success("Email sent successfully!");
-      console.log("Email sent successfully!");
-    } else {
-      antdMessage.error("Failed to send email.");
-      console.error("Failed to send email.");
+    try {
+      const ok = await sendEmailClient({ name, email, message });
+
+      if (ok) {
+        antdMessage.success("Email sent successfully!");
+        console.log("Email sent successfully!");
+      } else {
+        antdMessage.error("Failed to send email.");
+        console.error("Failed to send email.");
+      }
+    } catch (err) {
+      antdMessage.error("An unexpected error occurred.");
+      console.error("Unexpected error sending email:", err);
+    } finally {
+      setLoading(false);
+      onClose();
+      // Reset fields after closing
+      setName("");
+      setEmail("");
+      setMessage("");
     }
-
-    onClose();
-    setName("");
-    setEmail("");
-    setMessage("");
   };
 
   return (
@@ -70,6 +82,7 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
       width={600}
     >
       <div className="flex flex-col gap-6">
+        {/* Name Field */}
         <div>
           <label className="flex items-center gap-1 text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
             <span className="text-red-500 text-xl">*</span>
@@ -83,6 +96,7 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
           />
         </div>
 
+        {/* Email Field */}
         <div>
           <label className="flex items-center gap-1 text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
             <span className="text-red-500 text-xl">*</span>
@@ -97,6 +111,7 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
           />
         </div>
 
+        {/* Message Field */}
         <div>
           <label className="flex items-center gap-1 text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
             <span className="text-red-500 text-xl">*</span>
@@ -114,6 +129,7 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
           </small>
         </div>
 
+        {/* Send Button */}
         <Button
           type="primary"
           icon={<SendOutlined className="transform -rotate-45" />}
