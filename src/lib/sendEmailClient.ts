@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.DEV
-  ? "http://localhost:8081/send-email" // local dev
-  : "https://my-express-server.onrender.com/send-email"; // deployed backend
+  ? "http://localhost:8081/send-email"
+  : "https://my-express-server.onrender.com/send-email";
 
 export async function sendEmailClient(
   name: string,
@@ -14,7 +14,11 @@ export async function sendEmailClient(
       body: JSON.stringify({ name, email, message }),
     });
 
-    if (!res.ok) return false;
+    if (!res.ok) {
+      console.error("Server returned non-OK:", res.status, await res.text());
+      return false;
+    }
+
     const data = await res.json().catch(() => null);
     return data?.success === true;
   } catch (err) {

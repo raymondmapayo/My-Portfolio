@@ -9,24 +9,29 @@ const app = express();
 
 // ===== Allowed frontend domains =====
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://raymondmapayo24.vercel.app",
+  "http://localhost:5173", // dev
+  "https://my-portfolio-evh016hbe-raymonds-projects-0478c341.vercel.app", // Vercel prod
 ];
 
-// ===== CORS =====
+// ===== CORS setup =====
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn("Blocked by CORS:", origin);
         callback(new Error("CORS not allowed for this origin"));
       }
     },
     methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
+
+// Handle preflight globally (fixed TS6133 warning)
+app.options("*", (_req, res) => res.sendStatus(200));
 
 // ===== JSON parser =====
 app.use(express.json());
@@ -41,13 +46,13 @@ app.post("/send-email", async (req, res) => {
   }
 
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS?.replace(/\s+/g, "");
+  const emailPass = process.env.EMAIL_PASS?.trim();
 
   if (!emailUser || !emailPass) {
     console.error("EMAIL_USER or EMAIL_PASS missing in environment");
     return res
       .status(500)
-      .json({ success: false, error: "Email credentials missing" });
+      .json({ success: false, message: "Email credentials missing" });
   }
 
   try {
@@ -71,9 +76,6 @@ app.post("/send-email", async (req, res) => {
     return res.status(500).json({ success: false, error: String(err) });
   }
 });
-
-// ===== OPTIONS preflight =====
-app.options("/send-email", (req, res) => res.sendStatus(200));
 
 // ===== Start server =====
 const PORT = process.env.PORT || 8081;
