@@ -11,12 +11,18 @@ const app = express();
 // Allow frontend origins
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://my-portfolio-n0gknm417-raymonds-projects-0478c341.vercel.app",
+  "https://raymondmapayo24.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed for this origin"));
+      }
+    },
     methods: ["POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })

@@ -1,7 +1,6 @@
 const API_URL = import.meta.env.DEV
   ? "http://localhost:8081/api/send-email" // local dev Express server
-  : "https://my-express-server.onrender.com/api/send-email";
-// <-- change this to your actual deployed backend
+  : "https://my-express-server.onrender.com/api/send-email"; // your deployed backend URL
 
 export async function sendEmailClient(
   name: string,
