@@ -1,3 +1,4 @@
+// server.ts
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -7,23 +8,35 @@ dotenv.config();
 
 const app = express();
 
-// Enable CORS for your frontend domain (replace with your actual Vercel URL)
+// ===== CORS =====
+// Allow your frontend domains
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://my-portfolio-92b8nmbv3-raymonds-projects-0478c341.vercel.app", // deployed frontend
+];
+
 app.use(
   cors({
-    origin:
-      "https://my-portfolio-brmq2nzkg-raymonds-projects-0478c341.vercel.app", // your frontend URL
-    methods: ["GET", "POST", "OPTIONS"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed for this origin"));
+      }
+    },
+    methods: ["POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
 
-// Parse JSON bodies
+// ===== JSON parser =====
 app.use(express.json());
 
-// POST /api/send-email
+// ===== POST /api/send-email =====
 app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
   if (!name || !email || !message) {
+    console.error("Missing fields:", req.body);
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
@@ -31,45 +44,44 @@ app.post("/api/send-email", async (req, res) => {
   const emailPass = process.env.EMAIL_PASS?.replace(/\s+/g, "");
 
   if (!emailUser || !emailPass) {
-    console.error("EMAIL_USER or EMAIL_PASS missing in .env");
+    console.error("EMAIL_USER or EMAIL_PASS missing in environment");
     return res
       .status(500)
-      .json({ success: false, error: "Server email credentials missing" });
+      .json({ success: false, error: "Email credentials missing" });
   }
 
-  // Debug logs
-  console.log("EMAIL_USER:", emailUser);
-  console.log("EMAIL_PASS:", emailPass ? "SET" : "MISSING");
-  console.log("Request body:", req.body);
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: emailUser, pass: emailPass },
-  });
+  console.log("EMAIL_USER loaded:", emailUser ? true : false);
 
   try {
-    // Timeout wrapper for 30 seconds
-    const info = await Promise.race([
-      transporter.sendMail({
-        from: emailUser,
-        replyTo: email,
-        to: emailUser,
-        subject: `New message from ${name}`,
-        text: message,
-      }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("sendMail timed out")), 30000)
-      ),
-    ]);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: emailUser, pass: emailPass },
+    });
+
+    console.log("Sending email...", { name, email, message });
+
+    const info = await transporter.sendMail({
+      from: emailUser,
+      replyTo: email,
+      to: emailUser,
+      subject: `New message from ${name}`,
+      text: message,
+    });
 
     console.log("Email sent:", info.messageId ?? info);
-    return res.status(200).json({ success: true });
+
+    return res.status(200).json({ success: true, info: info });
   } catch (err) {
     console.error("Nodemailer sendMail error:", err);
     return res.status(500).json({ success: false, error: String(err) });
   }
 });
 
-// Start the server
+// ===== OPTIONS preflight =====
+app.options("/api/send-email", (req, res) => {
+  res.sendStatus(200);
+});
+
+// ===== Start server =====
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
