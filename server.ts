@@ -2,18 +2,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import nodemailer from "nodemailer";
-import path from "path";
 
 dotenv.config();
 
-const app = express();
+const app = express(); // ✅ works now
 app.use(cors());
 app.use(express.json());
 
-// Serve React build (after running npm run build)
-app.use(express.static(path.join(__dirname, "dist"))); // adjust if your build folder is elsewhere
-
-// API route
 app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
   if (!name || !email || !message)
@@ -23,7 +18,7 @@ app.post("/api/send-email", async (req, res) => {
   const emailPass = process.env.EMAIL_PASS?.replace(/\s/g, "");
 
   if (!emailUser || !emailPass) {
-    console.error("EMAIL_USER or EMAIL_PASS missing in .env");
+    console.error("EMAIL_USER or EMAIL_PASS is missing in .env");
     return res
       .status(500)
       .json({ success: false, error: "Server email credentials missing" });
@@ -32,7 +27,10 @@ app.post("/api/send-email", async (req, res) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      auth: { user: emailUser, pass: emailPass },
+      auth: {
+        user: emailUser,
+        pass: emailPass,
+      },
     });
 
     await transporter.sendMail({
@@ -50,12 +48,4 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
-// Catch all other requests and serve React
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
-
-const PORT = process.env.PORT || 8081;
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+app.listen(8081, () => console.log("Server running on http://localhost:8081"));
