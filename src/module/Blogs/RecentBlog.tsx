@@ -60,7 +60,11 @@ const RecentBlog = () => {
       title: "Post",
       key: "post",
       render: (_, record) => (
-        <Link to={`/myblog/${record.id}`} className="block w-full">
+        <Link
+          // ✅ add #top so browser will immediately jump to element with id="top"
+          to={`/myblog/${record.id}#top`}
+          className="block w-full"
+        >
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5 w-full">
             {/* Responsive thumbnail (kept flex-shrink-0) */}
             <div
@@ -106,7 +110,7 @@ const RecentBlog = () => {
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-3 sm:p-5 transition-colors duration-300 max-w-full">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-3 sm:p-5 transition-colors duration-300 max-w-full">
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
         <GiAnticlockwiseRotation className="text-gray-700 dark:text-gray-200 w-6 h-6" />

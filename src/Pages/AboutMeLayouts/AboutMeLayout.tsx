@@ -21,14 +21,27 @@ const AboutMeLayout = () => {
   }, []);
 
   return (
-    <div className="rounded-2xl bg-[#E6FAFD] dark:bg-gray-800 p-4 flex-1 min-w-[130px]  flex flex-col xl:flex-row gap-4 transition-colors duration-300">
+    <div
+      className="rounded-2xl bg-[#E6FAFD] dark:bg-gray-800 min-w-[130px]  transition-colors duration-300    w-full
+      
+
+        /* mobile: full edge-to-edge */
+        p-0 
+
+        /* restore padding and  corners on xl */
+        xl:p-4 xl:rounded-2xl
+
+        /* layout */
+        flex-1 flex flex-col xl:flex-row gap-4
+    pb-8 "
+    >
       {/* Left Side */}
       <div className="w-full xl:w-[52%] flex flex-col gap-4">
         {/* Hero/Profile */}
         {loading ? (
           <ProfileSkeleton />
         ) : (
-          <div className="relative flex flex-col rounded-xl overflow-hidden shadow-md">
+          <div className="relative flex flex-col rounded-none xl:rounded-2xl  overflow-hidden shadow-md">
             <div className="h-28 sm:h-36 lg:h-44 bg-[url('/design.jpg')] bg-cover bg-center w-full"></div>
             <img
               src="/maps_image.jpg"

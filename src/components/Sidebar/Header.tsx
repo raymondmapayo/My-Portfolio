@@ -9,9 +9,7 @@ const Header = ({
 }) => {
   return (
     <div
-      className={`flex items-center justify-between p-4 bg-white dark:bg-[#2b1d11] md:hidden transition-all duration-300 sticky top-0 z-50 shadow-sm ${
-        isSidebarOpen ? "translate-y-[-100%]" : "translate-y-0"
-      }`}
+      className={`flex items-center justify-between p-4 bg-white dark:bg-[#2b1d11] md:hidden transition-all duration-300 sticky top-0 z-50 shadow-sm  ${isSidebarOpen ? "translate-y-[-100%]" : "translate-y-0"}`}
     >
       {/* Menu Icon */}
       <div className="flex items-center gap-3">

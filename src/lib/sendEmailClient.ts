@@ -5,9 +5,8 @@ export interface SendEmailPayload {
   message: string;
 }
 
-const BASE =
-  // prefer explicit runtime base (set in Vercel or Vite env)
-  (process.env.NEXT_PUBLIC_API_URL || process.env.VITE_API_URL) ?? "";
+// Use Vite env variable in frontend
+const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export async function sendEmailClient(
   payload: SendEmailPayload,
@@ -24,7 +23,6 @@ export async function sendEmailClient(
       signal: controller.signal,
     });
 
-    // attempt to parse JSON even on non-2xx for better logs
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {

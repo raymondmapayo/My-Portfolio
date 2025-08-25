@@ -58,7 +58,7 @@ const Skills = () => {
   const [pausedRow2, setPausedRow2] = useState(false);
   if (loading) return <SkillsSkeleton />;
   return (
-    <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-md font-[Poppins] overflow-hidden mx-0 lg:mx-0 lg:mr-4 pb-10 transition-colors duration-300 min-h-[215px]">
+    <div className="bg-white dark:bg-gray-900 p-8 rounded-none xl:rounded-2xl shadow-md font-[Poppins] overflow-hidden mx-0 lg:mx-0 lg:mr-4 pb-10 transition-colors duration-300 min-h-[215px]">
       {/* Title */}
       <div className="flex items-center gap-2 mb-5">
         <TbVectorBezier2 className="text-gray-700 dark:text-gray-200 w-6 h-6" />

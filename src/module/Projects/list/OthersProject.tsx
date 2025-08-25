@@ -64,7 +64,7 @@ const OthersProject = () => {
     );
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300 w-full">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300 w-full">
       <div className="flex items-center gap-3 mb-6">
         <FaGithub className="w-6 h-6 text-gray-700 dark:text-gray-200" />
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -99,10 +99,10 @@ const OthersProject = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <Link
-                    to={`/myprojects/${encodeURIComponent(project.title.replace(/\s+/g, "-"))}`}
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    } // ← scroll to top
+                    // ✅ add #top so browser can jump to top anchor in ProjectSinglePage
+                    to={`/myprojects/${encodeURIComponent(
+                      project.title.replace(/\s+/g, "-")
+                    )}#top`}
                     className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-500 transition-colors duration-300 flex-1 min-w-0 block overflow-hidden text-ellipsis whitespace-nowrap"
                     title={project.title}
                   >

@@ -61,7 +61,7 @@ const Project = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300 w-full">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300 w-full">
       <div className="flex items-center gap-3 mb-6">
         <TbFolderSearch className="w-6 h-6 text-gray-700 dark:text-gray-200" />
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">

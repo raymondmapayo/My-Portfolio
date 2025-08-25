@@ -25,10 +25,10 @@ const Resume = () => {
       </div>
 
       {/* PDF Viewer */}
-      <div className="w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700">
+      <div className="w-full flex-1 overflow-auto rounded-lg border border-gray-300 dark:border-gray-700">
         <iframe
           src="/Mapayo-Raymond.pdf#toolbar=0&navpanes=0&scrollbar=0"
-          className="w-full min-h-[70vh] sm:min-h-[80vh] md:min-h-[85vh]"
+          className="w-full h-[80vh] sm:h-[85vh] md:h-[90vh] lg:h-[95vh]"
           title="My Resume"
         />
       </div>

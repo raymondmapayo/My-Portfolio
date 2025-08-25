@@ -45,7 +45,23 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="rounded-2xl bg-[#E6FAFD] dark:bg-gray-800  p-4 flex-1 min-w-[130px]  flex flex-col xl:flex-row gap-4 transition-colors duration-300">
+    <div
+      className="
+        w-full
+        bg-[#E6FAFD] dark:bg-gray-800
+        transition-colors duration-300
+
+        /* mobile: full edge-to-edge */
+        p-0 rounded-none
+
+        /* restore padding and  corners on xl */
+        xl:p-4 xl:rounded-2xl
+
+        /* layout */
+        flex-1 flex flex-col xl:flex-row gap-4
+    pb-8 
+      "
+    >
       {/* Left Side */}
       <div className="w-full xl:w-2/3 flex flex-col gap-4">
         {/* Hero Section */}
@@ -53,11 +69,11 @@ const Home = () => {
           {loading ? (
             <HeroBannerSkeleton />
           ) : (
-            <div className="relative flex-1 min-w-[250px] h-64 sm:h-80 lg:h-96 rounded-xl overflow-hidden bg-[url('/design.jpg')] bg-cover bg-center">
+            <div className="relative flex-1 min-w-[250px] h-64 sm:h-80 lg:h-96 rounded-none xl:rounded-xl overflow-hidden bg-[url('/design.jpg')] bg-cover bg-center">
               <img
                 src="/design.jpg"
                 alt="Design"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-full object-cover rounded-none xl:rounded-xl"
               />
 
               {/* Date */}
@@ -67,7 +83,7 @@ const Home = () => {
               </div>
 
               {/* Typed Text */}
-              <div className="absolute bottom-6 sm:bottom-10 left-4 sm:left-6 text-slate-200 dark:text-gray-100 text-lg sm:text-2xl font-bold px-3 py-2 rounded-md akira-font">
+              <div className="absolute bottom-6 sm:bottom-10 left-4 sm:left-6 text-slate-200 dark:text-gray-100 text-lg sm:text-2xl font-bold px-3 py-2 rounded-none xl:rounded-md akira-font">
                 <span ref={typedRef} className="inline-block"></span>
               </div>
             </div>

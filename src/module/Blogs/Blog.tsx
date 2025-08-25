@@ -31,7 +31,7 @@ const MyBlogs = () => {
   const otherBlogs = blogs.filter((b) => b.id !== featuredBlog.id).slice(0, 2);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 min-w-[130px] transition-colors duration-300">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-4 min-w-[130px] transition-colors duration-300">
       {/* Section Header */}
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <FaRegPenToSquare className="w-5 h-5 sm:w-7 sm:h-7 text-gray-700 dark:text-gray-100" />

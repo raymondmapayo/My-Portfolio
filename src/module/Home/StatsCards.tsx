@@ -29,7 +29,7 @@ const StatsCards = () => {
   const technologies = row?.technologies ?? 0;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <LuChartSpline className="w-6 h-6 text-gray-700 dark:text-gray-200" />
@@ -43,7 +43,7 @@ const StatsCards = () => {
         {/* Experience */}
         <div className="group bg-gray-300 dark:bg-gray-800 hover:bg-[rgb(0,51,102)] transition-colors duration-300 rounded-2xl shadow p-5 flex flex-col min-h-[125px]">
           <div className="flex items-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-t from-[rgb(161,140,209)] to-[rgb(251,194,235)] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-none xl:rounded-2xl bg-gradient-to-t from-[rgb(161,140,209)] to-[rgb(251,194,235)] flex items-center justify-center">
               <CgTime className="text-[2.2rem] text-white group-hover:text-white transition-colors duration-300" />
             </div>
             <div className="flex items-baseline gap-2">

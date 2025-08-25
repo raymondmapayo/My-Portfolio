@@ -16,7 +16,7 @@ const AboutMe = () => {
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 min-w-[130px] 
+      className={`bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl  shadow-md p-4 min-w-[130px] 
         transition-all duration-500 ease-in-out`}
     >
       {/* Header */}

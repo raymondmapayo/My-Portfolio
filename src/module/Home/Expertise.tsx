@@ -40,7 +40,7 @@ const Expertise = () => {
       label: (
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-2xl bg-gradient-to-t ${gradient} flex items-center justify-center`}
+            className={`w-10 h-10 rounded-none xl:rounded-2xl bg-gradient-to-t ${gradient} flex items-center justify-center`}
           >
             <Icon className="text-white text-lg" />
           </div>
@@ -58,7 +58,7 @@ const Expertise = () => {
   });
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-md font-[Poppins] mx-0 lg:mx-0 lg:mr-4 pb-10 transition-colors duration-300 h-auto">
+    <div className="bg-white dark:bg-gray-900 p-8 rounded-none xl:rounded-2xl shadow-md font-[Poppins] mx-0 lg:mx-0 lg:mr-4 pb-10 transition-colors duration-300 h-auto">
       {/* Title */}
       <div className="flex items-center gap-2 mb-5">
         <TbUserSearch className="text-gray-700 dark:text-gray-200 w-6 h-6" />

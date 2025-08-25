@@ -15,16 +15,43 @@ const BlogsSinglePage = () => {
 
   const [localLoading, setLocalLoading] = useState(true);
 
+  // ✅ highlight state for clicked item
+  const [flash, setFlash] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => setLocalLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!id) return;
+    if (localLoading) return;
+
+    const hash = window.location.hash;
+    const targetId = hash ? hash.slice(1) : "top";
+    const el = document.getElementById(targetId);
+
+    if (el) {
+      el.scrollIntoView({ behavior: "auto", block: "start" });
+    } else {
+      const t = setTimeout(() => {
+        const el2 = document.getElementById(targetId);
+        if (el2) el2.scrollIntoView({ behavior: "auto", block: "start" });
+      }, 50);
+      return () => clearTimeout(t);
+    }
+
+    // flash highlight
+    setFlash(true);
+    const tf = setTimeout(() => setFlash(false), 1200);
+    return () => clearTimeout(tf);
+  }, [id, localLoading]);
+
   // Find blog by ID from schema data
   const blog = myBlogData.find((b) => String(b.id) === String(id));
-  const loading = false; // No hook loading
 
-  if (loading || localLoading) return <ListBlogSkeleton />;
+  // Show skeleton if still loading
+  if (localLoading) return <ListBlogSkeleton />;
 
   if (!blog) {
     return (
@@ -33,11 +60,19 @@ const BlogsSinglePage = () => {
       </div>
     );
   }
+
   return (
-    <div className="flex flex-col xl:flex-row gap-6 p-4">
+    <div className="  bg-[#E6FAFD] dark:bg-gray-800 flex flex-col xl:flex-row gap-6 xl:p-4 w-full">
+      {/* ✅ anchor target at the very top */}
+      <div id="top" style={{ scrollMarginTop: "64px" }} />
+
       {/* Left Section */}
       <div className="w-full xl:w-2/3 flex flex-col gap-4">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 transition-colors duration-300">
+        <div
+          className={`bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-4 transition-colors duration-300
+            ${flash ? "bg-gray-100 dark:bg-gray-800" : ""} 
+            xl:-ml-6`} // <-- responsive left shift
+        >
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
@@ -85,11 +120,32 @@ const BlogsSinglePage = () => {
                     className="text-gray-700 dark:text-gray-300 leading-relaxed text-base whitespace-pre-line"
                   >
                     {processedText.map((part: string, idx: number) => {
-                      if (part === "YouTube") {
+                      if (
+                        [
+                          "YouTube",
+                          "Google",
+                          "XAMPP",
+                          "full-stack developer",
+                          "University of Mindanao",
+                          "HackerRank",
+                        ].includes(part)
+                      ) {
+                        const links: Record<string, string> = {
+                          YouTube:
+                            "https://www.youtube.com/watch?v=7S_tz1z_5bA&ab_channel=ProgrammingwithMosh",
+                          Google:
+                            "https://www.outrightcrm.com/blog/crud-operations-mysql-xampp-phpmyadmin/#section-7",
+                          "full-stack developer":
+                            "https://www.w3schools.com/whatis/whatis_fullstack.asp",
+                          "University of Mindanao":
+                            "https://www.umindanao.edu.ph/",
+                          HackerRank: "https://www.hackerrank.com/",
+                          XAMPP: "https://www.apachefriends.org/index.html",
+                        };
                         return (
                           <a
                             key={idx}
-                            href="https://www.youtube.com/watch?v=7S_tz1z_5bA&ab_channel=ProgrammingwithMosh"
+                            href={links[part]}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sky-500"
@@ -97,69 +153,8 @@ const BlogsSinglePage = () => {
                             {part}
                           </a>
                         );
-                      } else if (part === "Google") {
-                        return (
-                          <a
-                            key={idx}
-                            href="https://www.outrightcrm.com/blog/crud-operations-mysql-xampp-phpmyadmin/#section-7"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-500"
-                          >
-                            {part}
-                          </a>
-                        );
-                      } else if (part === "full-stack developer") {
-                        return (
-                          <a
-                            key={idx}
-                            href="https://www.w3schools.com/whatis/whatis_fullstack.asp"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-500"
-                          >
-                            {part}
-                          </a>
-                        );
-                      } else if (part === "University of Mindanao") {
-                        return (
-                          <a
-                            key={idx}
-                            href="https://www.umindanao.edu.ph/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-500"
-                          >
-                            {part}
-                          </a>
-                        );
-                      } else if (part === "HackerRank") {
-                        return (
-                          <a
-                            key={idx}
-                            href="https://www.hackerrank.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-500"
-                          >
-                            {part}
-                          </a>
-                        );
-                      } else if (part === "XAMPP") {
-                        return (
-                          <a
-                            key={idx}
-                            href="https://www.apachefriends.org/index.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sky-500"
-                          >
-                            {part}
-                          </a>
-                        );
-                      } else {
-                        return part;
                       }
+                      return part;
                     })}
                   </p>
                 );
@@ -182,7 +177,7 @@ const BlogsSinglePage = () => {
                   <div
                     key={index}
                     className="relative w-full mb-4 rounded-xl overflow-hidden bg-black"
-                    style={{ paddingTop: "60.25%" }} // maintains 16:9 aspect ratio; remove or change if your video has different ratio
+                    style={{ paddingTop: "60.25%" }}
                   >
                     <video
                       src={block.src}
@@ -203,7 +198,7 @@ const BlogsSinglePage = () => {
 
       {/* Right Section */}
       <div className="w-full xl:w-1/3 flex flex-col gap-4">
-        <RecentBlog /> {/* just render your existing component */}
+        <RecentBlog />
         <GitinTouch />
       </div>
     </div>

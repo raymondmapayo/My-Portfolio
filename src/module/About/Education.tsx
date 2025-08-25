@@ -17,7 +17,7 @@ const Education = () => {
   if (loading) return <EducationSkeleton />;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-4 sm:p-6 transition-colors duration-300 max-w-full">
+    <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl  shadow-md p-4 sm:p-6 transition-colors duration-300 max-w-full">
       {/* Title */}
       <div className="flex items-center gap-2 mb-5">
         <BsBookHalf className="text-gray-700 dark:text-gray-200 w-6 h-6" />

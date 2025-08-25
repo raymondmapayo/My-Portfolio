@@ -1,9 +1,11 @@
 // keep these imports — DO NOT remove
+import ProjectSinglePageSkeleton from "@/components/Skeleton/Project/ProjectSinglePageSkeleton"; // import skeleton
 import { CiDesktop } from "react-icons/ci";
 import { GrLocationPin } from "react-icons/gr";
 import { IoArrowBackSharp, IoHammerOutline } from "react-icons/io5";
 import { RiCalendarTodoLine } from "react-icons/ri";
 
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 // type-only import for Project
@@ -50,94 +52,135 @@ const ProjectSinglePage = () => {
     (p) => slugify(p.title) === titleSlug
   );
 
+  // Local loading — used to ensure anchor exists before jumping
+  const [localLoading, setLocalLoading] = useState(true);
+
+  useEffect(() => {
+    // simulate small mount delay so DOM settles (adjust if you have skeleton)
+    const t = setTimeout(() => setLocalLoading(false), 120);
+    return () => clearTimeout(t);
+  }, []);
+
+  // When navigated-in (title param changes), wait for localLoading then jump instantly to #top anchor
+  useEffect(() => {
+    if (!titleSlug) return;
+    if (localLoading) return;
+
+    const hash = window.location.hash;
+    const targetId = hash ? hash.slice(1) : "top";
+    const el = document.getElementById(targetId);
+
+    if (el) {
+      // instant jump (non-smooth)
+      el.scrollIntoView({ behavior: "auto", block: "start" });
+    } else {
+      // fallback: try shortly after
+      const tt = setTimeout(() => {
+        const el2 = document.getElementById(targetId);
+        if (el2) el2.scrollIntoView({ behavior: "auto", block: "start" });
+      }, 50);
+      return () => clearTimeout(tt);
+    }
+  }, [titleSlug, localLoading]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
   if (!project) return <p className="text-center p-6">Project not found.</p>;
-
+  if (loading || localLoading) return <ProjectSinglePageSkeleton />;
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6 transition-colors duration-300 w-full">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-400 text-gray-700 dark:text-gray-100 hover:border-[#1890ff] hover:text-[#1890ff] transition-colors duration-300 mb-4 bg-transparent"
-      >
-        <IoArrowBackSharp className="text-lg" />
-      </button>
+    <div className="w-full">
+      {/* anchor target at top */}
+      <div id="top" style={{ scrollMarginTop: "64px" }} />
 
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {project.title}
-        </h2>
-        <span
-          className={`text-xs font-medium px-2 py-1 rounded-md ${
-            project.visibility === "Public"
-              ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
-              : "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
-          }`}
+      <div className="bg-white dark:bg-gray-900 rounded-none xl:rounded-2xl shadow-md p-6 transition-colors duration-300 w-full">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-400 text-gray-700 dark:text-gray-100 hover:border-[#1890ff] hover:text-[#1890ff] transition-colors duration-300 mb-4 bg-transparent focus:outline-none focus:ring-0"
         >
-          {project.visibility}
-        </span>
-      </div>
+          <IoArrowBackSharp className="text-lg" />
+        </button>
 
-      {/* Tech Stack */}
-      <div className="flex gap-2 flex-wrap mb-6">
-        {project.tech.map((tech: string) => (
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {project.title}
+          </h2>
           <span
-            key={tech}
-            className="text-gray-700 dark:text-gray-200 text-xs font-semibold px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md"
+            className={`text-xs font-medium px-2 py-1 rounded-md ${
+              project.visibility === "Public"
+                ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+                : "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+            }`}
           >
-            {tech}
+            {project.visibility}
           </span>
+        </div>
+
+        {/* Tech Stack */}
+        <div className="flex gap-2 flex-wrap mb-6">
+          {project.tech.map((tech: string) => (
+            <span
+              key={tech}
+              className="text-gray-700 dark:text-gray-200 text-xs font-semibold px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-4 mb-6">
+          {project.info?.map((item, idx) => {
+            const iconValue = (item as any).icon;
+            let IconComp: any = null;
+
+            if (
+              typeof iconValue === "function" ||
+              (typeof iconValue === "object" && iconValue !== null)
+            ) {
+              IconComp = iconValue;
+            } else if (typeof iconValue === "string" && ICONS_MAP[iconValue]) {
+              IconComp = ICONS_MAP[iconValue];
+            } else {
+              IconComp = null;
+            }
+
+            return (
+              <div
+                key={idx}
+                className="flex items-center gap-2 text-gray-700 dark:text-gray-200 text-base"
+              >
+                {IconComp ? (
+                  <IconComp className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <span className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span>{item.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {project.images.map((image: ProjectImage, index: number) => (
+          <div key={index} className="mb-8">
+            <div className="w-full h-[400px] flex items-center justify-center overflow-hidden rounded-lg shadow-md mb-3 bg-gray-100 dark:bg-gray-800">
+              <img
+                src={image.src}
+                className="max-w-full max-h-full object-contain"
+                alt={`project-image-${index}`}
+              />
+            </div>
+            {image.paragraphs &&
+              image.paragraphs.map((p, idx) => (
+                <p key={idx} className="text-gray-800 dark:text-gray-100 mb-2">
+                  {p}
+                </p>
+              ))}
+          </div>
         ))}
       </div>
-
-      <div className="flex flex-col gap-4 mb-6">
-        {project.info?.map((item, idx) => {
-          const iconValue = (item as any).icon;
-          let IconComp: any = null;
-
-          if (
-            typeof iconValue === "function" ||
-            (typeof iconValue === "object" && iconValue !== null)
-          ) {
-            IconComp = iconValue;
-          } else if (typeof iconValue === "string" && ICONS_MAP[iconValue]) {
-            IconComp = ICONS_MAP[iconValue];
-          } else {
-            IconComp = null;
-          }
-
-          return (
-            <div
-              key={idx}
-              className="flex items-center gap-2 text-gray-700 dark:text-gray-200 text-base"
-            >
-              {IconComp ? (
-                <IconComp className="w-5 h-5 flex-shrink-0" />
-              ) : (
-                <span className="w-5 h-5 flex-shrink-0" />
-              )}
-              <span>{item.label}</span>
-            </div>
-          );
-        })}
-      </div>
-
-      {project.images.map((image: ProjectImage, index: number) => (
-        <div key={index} className="mb-8">
-          <div className="w-full h-[400px] flex items-center justify-center overflow-hidden rounded-lg shadow-md mb-3 bg-gray-100 dark:bg-gray-800">
-            <img
-              src={image.src}
-              className="max-w-full max-h-full object-contain"
-              alt={`project-image-${index}`}
-            />
-          </div>
-          {image.paragraphs &&
-            image.paragraphs.map((p, idx) => (
-              <p key={idx} className="text-gray-800 dark:text-gray-100 mb-2">
-                {p}
-              </p>
-            ))}
-        </div>
-      ))}
     </div>
   );
 };
