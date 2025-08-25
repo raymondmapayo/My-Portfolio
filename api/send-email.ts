@@ -23,6 +23,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .json({ success: false, error: "Email credentials missing" });
   }
 
+  // Optional debug logs (won't break anything)
+  console.log("EMAIL_USER:", emailUser);
+  console.log("EMAIL_PASS:", emailPass ? "SET" : "MISSING");
+  console.log("Request body:", req.body);
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: { user: emailUser, pass: emailPass },
