@@ -1,17 +1,17 @@
-// api/send-email.ts
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+// api/send-email.js  (ESM)
+// Full, uncut file — paste as-is into your repository at /api/send-email.js
 import nodemailer from "nodemailer";
 
-// Use the supported Node serverless runtime
 export const config = { runtime: "nodejs" };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Quick health check for GET
+// Handler for Vercel serverless function
+export default async function handler(req, res) {
+  // Allow a simple GET health check
   if (req.method === "GET") {
     return res.status(200).json({ ok: true, now: new Date().toISOString() });
   }
 
-  // Only POST allowed for sending email
+  // Only POST is allowed for sending emails
   if (req.method !== "POST") {
     return res
       .status(405)
@@ -19,11 +19,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Read env vars
+    // Read environment variables
     const EMAIL_USER = process.env.EMAIL_USER;
     const EMAIL_PASS = process.env.EMAIL_PASS;
 
-    // Debug: log presence (do not log actual values)
+    // Log presence of envs (do NOT log the values themselves)
     console.log(
       "Env - EMAIL_USER present:",
       !!EMAIL_USER,
@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (EMAIL_PASS)
       console.log("EMAIL_PASS length:", String(EMAIL_PASS).length);
 
-    // Missing envs -> clear error
+    // If envs missing, return clear error
     if (!EMAIL_USER || !EMAIL_PASS) {
       return res.status(500).json({
         success: false,
@@ -45,8 +45,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Safely parse body (avoid crashing on invalid JSON)
-    let body: any = {};
+    // Safely parse request body (avoid crashing on invalid JSON)
+    let body = {};
     try {
       body =
         typeof req.body === "string"
@@ -61,10 +61,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Accept diagnostic mode flag
+    // Extract fields
     const { name, email, message, testOnly } = body ?? {};
 
-    // Diagnostic mode: do not attempt SMTP; only report env presence
+    // Diagnostic-only mode: do not attempt SMTP; return env presence
     if (testOnly === true) {
       return res.status(200).json({
         success: true,
@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Validate required fields for an email send
+    // Validate required fields for actual send
     if (!name || !email || !message) {
       return res.status(400).json({
         success: false,
@@ -85,37 +85,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Create transporter with timeouts suitable for serverless
+    // Create Nodemailer transporter with reasonable timeouts for serverless
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true,
+      secure: true, // use SSL
       auth: { user: EMAIL_USER, pass: EMAIL_PASS },
-      // Add timeouts to reduce chance of long TCP hangs in serverless
-      connectionTimeout: 10_000, // 10 seconds
-      greetingTimeout: 10_000,
-      socketTimeout: 10_000,
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
       tls: {
-        rejectUnauthorized: false, // aids some serverless TLS environments; change if you prefer strict TLS
+        // In some serverless environments this avoids TLS handshake rejections.
+        // If you want strict TLS, remove this line.
+        rejectUnauthorized: false,
       },
     });
 
-    // Send mail (will throw on auth/network errors)
+    // Send the email (to yourself) and set replyTo to the visitor
     const info = await transporter.sendMail({
       from: EMAIL_USER,
-      to: EMAIL_USER, // always send to yourself (EMAIL_USER)
-      replyTo: email, // so you can reply to the visitor
+      to: EMAIL_USER, // always send to your inbox
+      replyTo: email, // visitor's address for replies
       subject: `New message from ${name}`,
       text: `From: ${name} <${email}>\n\n${message}`,
       html: `<p><strong>From:</strong> ${name} &lt;${email}&gt;</p><p>${message}</p>`,
     });
 
-    console.log("sendMail success, id:", (info as any)?.messageId ?? info);
+    console.log("sendMail success, id:", info?.messageId ?? info);
     return res
       .status(200)
-      .json({ success: true, messageId: (info as any)?.messageId ?? null });
-  } catch (err: any) {
-    // Log full error in server logs for debugging
+      .json({ success: true, messageId: info?.messageId ?? null });
+  } catch (err) {
+    // Log error server-side for debugging, but return a safe JSON to client
     console.error("SEND_FAILED error:", err);
     return res.status(500).json({
       success: false,
