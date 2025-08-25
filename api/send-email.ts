@@ -29,13 +29,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   try {
-    const info = await transporter.sendMail({
-      from: emailUser,
-      replyTo: email,
-      to: emailUser,
-      subject: `New message from ${name}`,
-      text: message,
-    });
+    // Timeout wrapper for 30 seconds
+    const info = await Promise.race([
+      transporter.sendMail({
+        from: emailUser,
+        replyTo: email,
+        to: emailUser,
+        subject: `New message from ${name}`,
+        text: message,
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("sendMail timed out")), 30000)
+      ),
+    ]);
+
     console.log("Email sent:", info.messageId ?? info);
     return res.status(200).json({ success: true });
   } catch (err) {
