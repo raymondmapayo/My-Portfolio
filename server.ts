@@ -1,3 +1,4 @@
+// server.ts
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -7,41 +8,27 @@ dotenv.config();
 
 const app = express();
 
-// ===== CORS =====
-// Allow your frontend domains
-// allow both strings and regex patterns
-const allowedOrigins: (string | RegExp)[] = [
-  "http://localhost:5173", // local dev
-  "https://my-portfolio-92b8nmbv3-raymonds-projects-0478c341.vercel.app", // old Vercel
-  "https://my-portfolio-n0gknm417-raymonds-projects-0478c341.vercel.app", // new Vercel
-  /\.vercel\.app$/i, // example: allow all Vercel preview URLs
+// Allow frontend origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://my-portfolio-n0gknm417-raymonds-projects-0478c341.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        allowedOrigins.some((o) =>
-          o instanceof RegExp ? o.test(origin) : o === origin
-        )
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed for this origin"));
-      }
-    },
+    origin: allowedOrigins,
     methods: ["POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
 
-// ===== JSON parser =====
+// JSON parser
 app.use(express.json());
 
-// ===== POST /api/send-email =====
+// POST /api/send-email
 app.post("/api/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
+
   if (!name || !email || !message) {
     console.error("Missing fields:", req.body);
     return res.status(400).json({ success: false, message: "Missing fields" });
@@ -65,9 +52,7 @@ app.post("/api/send-email", async (req, res) => {
       auth: { user: emailUser, pass: emailPass },
     });
 
-    console.log("Sending email...", { name, email, message });
-
-    const info = await transporter.sendMail({
+    await transporter.sendMail({
       from: emailUser,
       replyTo: email,
       to: emailUser,
@@ -75,25 +60,15 @@ app.post("/api/send-email", async (req, res) => {
       text: message,
     });
 
-    console.log("Email sent:", info.messageId ?? info);
-
-    return res.status(200).json({ success: true, info: info });
+    return res.status(200).json({ success: true });
   } catch (err) {
     console.error("Nodemailer sendMail error:", err);
     return res.status(500).json({ success: false, error: String(err) });
   }
 });
 
-// ===== OPTIONS preflight =====
-app.options(
-  "/api/send-email",
-  cors({
-    origin: allowedOrigins,
-    methods: ["POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+// OPTIONS preflight
+app.options("/api/send-email", (req, res) => res.sendStatus(200));
 
-// ===== Start server =====
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
