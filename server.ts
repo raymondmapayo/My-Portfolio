@@ -1,4 +1,3 @@
-// server.ts
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -8,12 +7,13 @@ dotenv.config();
 
 const app = express();
 
-// Allow frontend origins
+// ===== Allowed frontend domains =====
 const allowedOrigins = [
   "http://localhost:5173",
   "https://raymondmapayo24.vercel.app",
 ];
 
+// ===== CORS =====
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -28,11 +28,11 @@ app.use(
   })
 );
 
-// JSON parser
+// ===== JSON parser =====
 app.use(express.json());
 
-// POST /api/send-email
-app.post("/api/send-email", async (req, res) => {
+// ===== POST /send-email =====
+app.post("/send-email", async (req, res) => {
   const { name, email, message } = req.body ?? {};
 
   if (!name || !email || !message) {
@@ -50,15 +50,13 @@ app.post("/api/send-email", async (req, res) => {
       .json({ success: false, error: "Email credentials missing" });
   }
 
-  console.log("EMAIL_USER loaded:", emailUser ? true : false);
-
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: emailUser, pass: emailPass },
     });
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: emailUser,
       replyTo: email,
       to: emailUser,
@@ -66,6 +64,7 @@ app.post("/api/send-email", async (req, res) => {
       text: message,
     });
 
+    console.log("Email sent:", info.messageId ?? info);
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error("Nodemailer sendMail error:", err);
@@ -73,8 +72,9 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
-// OPTIONS preflight
-app.options("/api/send-email", (req, res) => res.sendStatus(200));
+// ===== OPTIONS preflight =====
+app.options("/send-email", (req, res) => res.sendStatus(200));
 
+// ===== Start server =====
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
