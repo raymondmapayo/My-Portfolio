@@ -5,19 +5,26 @@ export interface SendEmailPayload {
   message: string;
 }
 
+const BASE =
+  // prefer explicit runtime base (set in Vercel or Vite env)
+  (process.env.NEXT_PUBLIC_API_URL || process.env.VITE_API_URL) ?? "";
+
 export async function sendEmailClient(
-  payload: SendEmailPayload
+  payload: SendEmailPayload,
+  timeoutMs = 10000
 ): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
-    const res = await fetch("/api/send-email", {
-      method: "POST", // <-- MUST be POST
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const res = await fetch(`${BASE}/api/send-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
 
-    // try parse JSON even on non-2xx so we can log useful info
+    // attempt to parse JSON even on non-2xx for better logs
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -25,10 +32,15 @@ export async function sendEmailClient(
       return false;
     }
 
-    // success when { success: true }
     return data?.success === true;
-  } catch (err) {
-    console.error("sendEmailClient error:", err);
+  } catch (err: any) {
+    if (err?.name === "AbortError") {
+      console.error("sendEmailClient: request timed out");
+    } else {
+      console.error("sendEmailClient error:", err);
+    }
     return false;
+  } finally {
+    clearTimeout(timeout);
   }
 }
