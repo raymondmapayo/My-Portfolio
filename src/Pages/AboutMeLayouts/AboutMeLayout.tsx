@@ -13,6 +13,15 @@ import ModalMessage from "./AboutModal/ModalMessage";
 const AboutMeLayout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const images = ["/IT_1.jpg", "/design.jpg", "/IT_2.jpg"];
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 3000); // slide every 3 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   // Simulate loading for 2 seconds
   useEffect(() => {
@@ -42,7 +51,20 @@ const AboutMeLayout = () => {
           <ProfileSkeleton />
         ) : (
           <div className="relative flex flex-col rounded-none xl:rounded-2xl  overflow-hidden shadow-md">
-            <div className="h-28 sm:h-36 lg:h-44 bg-[url('/design.jpg')] bg-cover bg-center w-full"></div>
+            <div className="overflow-hidden relative h-28 sm:h-36 lg:h-44 w-full">
+              <div
+                className="flex transition-transform duration-700 ease-in-out h-full w-full"
+                style={{ transform: `translateX(-${current * 100}%)` }}
+              >
+                {images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-shrink-0 w-full h-full bg-cover bg-center"
+                    style={{ backgroundImage: `url('${img}')` }}
+                  ></div>
+                ))}
+              </div>
+            </div>
             <img
               src="/maps_image.jpg"
               alt="Profile"

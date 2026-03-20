@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import HeroBannerSkeleton from "@/components/Skeleton/Home/HeroBannerSkeleton";
 import TodayDate from "@/components/TodayDate/TodayDate";
 import Expertise from "@/module/Home/Expertise";
@@ -5,7 +6,6 @@ import Features from "@/module/Home/Features";
 import GitinTouch from "@/module/Home/GitinTouch";
 import Skills from "@/module/Home/Skills";
 import StatsCards from "@/module/Home/StatsCards";
-import { useEffect, useRef, useState } from "react";
 import { CiCalendarDate } from "react-icons/ci";
 import Typed from "typed.js";
 
@@ -13,7 +13,10 @@ const Home = () => {
   const typedRef = useRef<HTMLSpanElement>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize Typed.js only after loading is false
+  // Slider state
+  const sliderImages = ["/IT_1.jpg", "/IT_2.jpg", "/design.jpg"];
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
     if (loading || !typedRef.current) return;
 
@@ -38,10 +41,16 @@ const Home = () => {
 
   // Simulate skeleton loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Slider interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+    }, 3000); // slide every 3 seconds
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -50,16 +59,8 @@ const Home = () => {
         w-full
         bg-[#E6FAFD] dark:bg-gray-800
         transition-colors duration-300
-
-        /* mobile: full edge-to-edge */
-        p-0 rounded-none
-
-        /* restore padding and  corners on xl */
-        xl:p-4 xl:rounded-2xl
-
-        /* layout */
-        flex-1 flex flex-col xl:flex-row gap-4
-    pb-8 
+        p-0 rounded-none xl:p-4 xl:rounded-2xl
+        flex-1 flex flex-col xl:flex-row gap-4 pb-8
       "
     >
       {/* Left Side */}
@@ -69,12 +70,25 @@ const Home = () => {
           {loading ? (
             <HeroBannerSkeleton />
           ) : (
-            <div className="relative flex-1 min-w-[250px] h-64 sm:h-80 lg:h-96 rounded-none xl:rounded-xl overflow-hidden bg-[url('/design.jpg')] bg-cover bg-center">
-              <img
-                src="/design.jpg"
-                alt="Design"
-                className="w-full h-full object-cover rounded-none xl:rounded-xl"
-              />
+            <div className="relative flex-1 min-w-[250px] h-64 sm:h-80 lg:h-96 rounded-none xl:rounded-xl overflow-hidden">
+              {/* Sliding images */}
+              <div
+                className="flex h-full w-full transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {sliderImages.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-shrink-0 w-full h-full relative"
+                  >
+                    <img
+                      src={img}
+                      alt={`Slide ${idx + 1}`}
+                      className="w-full h-full object-cover rounded-none xl:rounded-xl"
+                    />
+                  </div>
+                ))}
+              </div>
 
               {/* Date */}
               <div className="absolute top-6 left-6 sm:top-10 sm:left-10 text-gray-100 dark:text-gray-300 text-base sm:text-lg font-bold flex items-center gap-2">

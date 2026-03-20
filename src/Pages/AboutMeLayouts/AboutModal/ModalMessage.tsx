@@ -53,7 +53,7 @@ const ModalMessage: React.FC<ModalMessageProps> = ({ open, onClose }) => {
       else {
         antdMessage.error("Failed to send email.");
         console.error(
-          "Failed to send email. Check network tab and server logs."
+          "Failed to send email. Check network tab and server logs.",
         );
       }
     } catch (err) {
