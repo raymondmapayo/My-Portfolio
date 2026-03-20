@@ -1,6 +1,6 @@
 import SideBarSkeleton from "@/components/Skeleton/Home/SideBarSkeleton";
 import { DownloadOutlined } from "@ant-design/icons";
-import { Avatar, Button, Layout, Switch } from "antd";
+import { Button, Layout, Switch } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { LuSunMoon } from "react-icons/lu";
 import { Outlet } from "react-router-dom";
@@ -45,54 +45,77 @@ export default function SidebarLayout() {
         {loading ? (
           <SideBarSkeleton />
         ) : (
-          <div className="sticky top-4">
-            <div>
-              <Avatar
-                size={120}
-                src="/maps_image.jpg"
-                style={{
-                  border: "3px solid #d9d9d9",
-                  display: "block",
-                  marginBottom: 16,
-                }}
-              />
-              <div className="text-center">
-                <h2 className="text-gray-900 dark:text-gray-100 text-lg font-bold">
-                  Raymond Mapayo
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-base mt-1 pr-3">
-                  Full Stack Developer
-                </p>
-                <Button
-                  icon={<DownloadOutlined />}
-                  href="/resume"
-                  className="w-[100%] !h-9 text-base font-semibold mt-3 md:mt-6 rounded-lg flex items-center justify-center gap-2"
-                >
-                  Resume
-                </Button>
+          <div className="flex flex-col h-screen">
+            {/* SCROLLABLE CONTENT */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="flex flex-col items-center">
+                {/* IMAGE */}
+                <div className="relative w-[120px] h-[120px] group cursor-pointer">
+                  {/* DEFAULT IMAGE */}
+                  <img
+                    src="/maps_image.jpg"
+                    alt="profile"
+                    className="w-full h-full object-cover rounded-full border-2 border-gray-300 transition-none group-hover:opacity-0"
+                  />
+
+                  {/* HOVER IMAGE */}
+                  <img
+                    src="/act-1.jpg" // 👉 your 2nd image
+                    alt="hover profile"
+                    className="absolute inset-0 w-full h-full object-cover rounded-full border-2 border-gray-300 opacity-0 group-hover:opacity-100 transition-none"
+                  />
+                </div>
+
+                {/* TEXT */}
+                <div className="text-center mt-3">
+                  <h2 className="text-gray-900 dark:text-gray-100 text-lg font-bold">
+                    Raymond Mapayo
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300 text-base mt-1">
+                    Full Stack Developer
+                  </p>
+
+                  <Button
+                    icon={<DownloadOutlined />}
+                    href="/resume"
+                    className="w-full !h-9 text-base font-semibold mt-3 md:mt-6 rounded-lg flex items-center justify-center gap-2"
+                  >
+                    Resume
+                  </Button>
+                </div>
               </div>
 
-              {/* Navigation */}
-
+              {/* MENU */}
               <MenuItems />
             </div>
 
-            <div className="mt-6">
-              <div className="flex items-center justify-between gap-3 max-w-[240px] bg-gray-100 dark:bg-gray-700 rounded-lg px-6 py-3 cursor-pointer">
-                <LuSunMoon className="text-2xl text-gray-600 dark:text-gray-200" />
-                <span className="whitespace-nowrap text-gray-600 dark:text-gray-200 text-sm sm:text-base">
-                  Dark Mode
-                </span>
-                <Switch checked={isDarkMode} onChange={toggleTheme} />
-              </div>
+            {/* ✅ FIXED FOOTER */}
+            <div className="pt-4 pb-6 px-2">
+              {/* BOX */}
+              <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl p-4 shadow-sm">
+                {/* Dark Mode Row */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <LuSunMoon className="text-xl text-green-600 dark:text-green-300" />
+                    <span className="text-green-700 dark:text-green-200 text-sm font-medium">
+                      Dark Mode
+                    </span>
+                  </div>
+                  <Switch checked={isDarkMode} onChange={toggleTheme} />
+                </div>
 
-              <div className="mt-4 flex flex-col sm:flex-row flex-wrap justify-center text-center sm:text-left gap-1 text-xs sm:text-sm">
-                <small className="text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                  Designed &amp; Built by Raymond Mapayo
-                </small>
-                <small className="text-gray-400 dark:text-gray-400 sm:ml-2">
-                  © 2025, All rights reserved.
-                </small>
+                {/* Divider */}
+                <div className="my-3 border-t border-green-200 dark:border-green-700"></div>
+
+                {/* Footer Text */}
+                <div className="text-center text-xs">
+                  <p className="text-green-700 dark:text-green-300">
+                    Designed & Built by Raymond Mapayo
+                  </p>
+                  <p className="text-green-500 dark:text-green-400">
+                    © 2025 All rights reserved
+                  </p>
+                </div>
               </div>
             </div>
           </div>

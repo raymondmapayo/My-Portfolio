@@ -23,17 +23,17 @@ const AboutMeLayout = () => {
   return (
     <div
       className="rounded-2xl bg-[#E6FAFD] dark:bg-gray-800 min-w-[130px]  transition-colors duration-300    w-full
-      
+        
 
-        /* mobile: full edge-to-edge */
-        p-0 
+          /* mobile: full edge-to-edge */
+          p-0 
 
-        /* restore padding and  corners on xl */
-        xl:p-4 xl:rounded-2xl
+          /* restore padding and  corners on xl */
+          xl:p-4 xl:rounded-2xl
 
-        /* layout */
-        flex-1 flex flex-col xl:flex-row gap-4
-    pb-8 "
+          /* layout */
+          flex-1 flex flex-col xl:flex-row gap-4
+      pb-8 "
     >
       {/* Left Side */}
       <div className="w-full xl:w-[52%] flex flex-col gap-4">
